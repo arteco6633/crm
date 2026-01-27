@@ -1,5 +1,24 @@
 import { supabase } from '../config/supabase.js';
 
+async function getBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  return await new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', (chunk) => {
+      data += chunk;
+    });
+    req.on('end', () => {
+      if (!data) return resolve({});
+      try {
+        resolve(JSON.parse(data));
+      } catch (e) {
+        reject(e);
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
 export default async function handler(req, res) {
   const { method } = req;
 
@@ -21,7 +40,7 @@ export default async function handler(req, res) {
 
   if (method === 'POST') {
     try {
-      const { name, email, phone, company, status } = req.body || {};
+      const { name, email, phone, company, status } = await getBody(req);
 
       const { data, error } = await supabase
         .from('clients')

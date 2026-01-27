@@ -1,5 +1,24 @@
 import { supabase } from '../../config/supabase.js';
 
+async function getBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  return await new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', (chunk) => {
+      data += chunk;
+    });
+    req.on('end', () => {
+      if (!data) return resolve({});
+      try {
+        resolve(JSON.parse(data));
+      } catch (e) {
+        reject(e);
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
 export default async function handler(req, res) {
   const {
     query: { id },
@@ -38,7 +57,7 @@ export default async function handler(req, res) {
   if (method === 'PUT') {
     try {
       const { title, description, client_id, deal_id, status, due_date, priority } =
-        req.body || {};
+        await getBody(req);
 
       const updateData = {};
       if (title !== undefined) updateData.title = title;
