@@ -14,10 +14,11 @@
   align-items: center;
   gap: 1.25rem;
   padding: 0.9rem 1.25rem;
-  border-radius: 999px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(229, 231, 235, 0.9);
   box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .client-row-main {
@@ -195,8 +196,86 @@
   font-size: 0.9375rem;
 }
 
+/* Планшет: одна колонка карточек */
+@media (max-width: 1024px) {
+  .clients-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
 @media (max-width: 768px) {
   .clients-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .clients-page .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .clients-page .page-header .btn-primary {
+    width: 100%;
+    justify-content: center;
+    min-height: var(--touch-target);
+  }
+
+  .empty-state {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .empty-state h3 {
+    font-size: 1.125rem;
+  }
+}
+
+/* Список клиентов (client-row): на мобильном — карточный вид */
+@media (max-width: 768px) {
+  .client-row {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 18px;
+    text-align: left;
+  }
+
+  .client-row-main {
+    grid-column: 1;
+  }
+
+  .client-row-contact {
+    grid-column: 1;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .client-row-actions {
+    grid-column: 1;
+    justify-content: flex-start;
+    padding-top: 0.5rem;
+  }
+
+  .client-row-actions .btn-icon {
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
+  }
+}
+
+@media (max-width: 480px) {
+  .clients-page .page-header h2 {
+    font-size: 0.9375rem;
+  }
+
+  .client-card {
+    padding: 1.25rem;
+  }
+
+  .client-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
   }
 }

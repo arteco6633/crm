@@ -64,3 +64,12 @@ CREATE TRIGGER update_deals_updated_at BEFORE UPDATE ON deals
 
 CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- RLS: доступ для anon (API с anon-ключом) к таблицам
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE deals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "clients_anon_all" ON clients FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "deals_anon_all" ON deals FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "tasks_anon_all" ON tasks FOR ALL TO anon USING (true) WITH CHECK (true);

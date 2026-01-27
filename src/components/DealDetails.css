@@ -341,9 +341,97 @@
   white-space: pre-wrap;
 }
 
+/* Адаптив: планшет — одна колонка */
 @media (max-width: 900px) {
   .deal-layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Адаптив: мобильные */
+@media (max-width: 768px) {
+  .deal-details {
+    padding: 0.75rem 1rem 1.5rem;
+    margin-top: 0;
+    border-radius: 16px;
+    min-height: auto;
+  }
+
+  .deal-details-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+  }
+
+  .close-btn {
+    align-self: flex-end;
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
+  }
+
+  .deal-header-main h2 {
+    font-size: 1.125rem;
+  }
+
+  .deal-info-block {
+    padding: 1rem 1.25rem;
+  }
+
+  .deal-info-block h3 {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .deal-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .value-input {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .deal-tasks-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .deal-right-tabs {
+    flex-wrap: wrap;
+  }
+
+  .right-tab {
+    min-height: var(--touch-target);
+  }
+
+  .deal-task-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .deal-task-meta {
+    align-items: flex-start;
+  }
+
+  .task-inline-actions {
+    flex-wrap: wrap;
+  }
+
+  .task-inline-btn {
+    min-height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .deal-details {
+    padding: 0.5rem 0.75rem 1rem;
+  }
+
+  .deal-info-block {
+    padding: 0.875rem 1rem;
   }
 }
 

@@ -160,3 +160,84 @@
 .empty-state p {
   font-size: 0.9375rem;
 }
+
+/* Адаптив: планшет */
+@media (max-width: 1024px) {
+  .tasks-filters {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .filter-btn {
+    min-height: var(--touch-target);
+  }
+}
+
+/* Адаптив: мобильные */
+@media (max-width: 768px) {
+  .tasks-page .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .tasks-page .page-header .btn-primary {
+    width: 100%;
+    justify-content: center;
+    min-height: var(--touch-target);
+  }
+
+  .tasks-filters {
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .filter-btn {
+    flex: 1;
+    min-width: 80px;
+    min-height: var(--touch-target);
+  }
+
+  .task-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .task-checkbox {
+    align-self: flex-start;
+  }
+
+  .task-meta {
+    gap: 0.5rem;
+  }
+
+  .task-actions {
+    flex-wrap: wrap;
+  }
+
+  .task-actions .btn-icon {
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
+  }
+
+  .empty-state {
+    padding: 2.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tasks-page .page-header h2 {
+    font-size: 0.9375rem;
+  }
+
+  .task-content h3 {
+    font-size: 0.9375rem;
+  }
+
+  .task-priority,
+  .task-meta-item {
+    font-size: 0.75rem;
+  }
+}
