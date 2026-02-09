@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { LayoutDashboard, Users, KanbanSquare, CheckSquare2, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
@@ -19,7 +19,23 @@ const API_BASE = '/api';
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedDealId, setSelectedDealId] = useState(null);
+  const [activeTasksCount, setActiveTasksCount] = useState(0);
   const isDealDetails = activeTab === 'deals' && selectedDealId;
+
+  const fetchActiveTasksCount = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/tasks`);
+      const data = await res.json();
+      const tasks = Array.isArray(data) ? data : [];
+      setActiveTasksCount(tasks.filter(t => t.status !== 'completed').length);
+    } catch {
+      setActiveTasksCount(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchActiveTasksCount();
+  }, [fetchActiveTasksCount]);
 
   return (
     <div className="app">
@@ -62,13 +78,16 @@ function App() {
             </button>
             <button
               className={`sidebar-icon-button ${activeTab === 'tasks' ? 'active' : ''}`}
-              aria-label="Задачи"
+              aria-label={activeTasksCount > 0 ? `Задачи (${activeTasksCount} активных)` : 'Задачи'}
               onClick={() => {
                 setActiveTab('tasks');
                 setSelectedDealId(null);
               }}
             >
               <CheckSquare2 size={20} />
+              {activeTasksCount > 0 && (
+                <span className="sidebar-badge sidebar-badge--tasks">{activeTasksCount}</span>
+              )}
             </button>
           </nav>
           <div className="sidebar-footer">
@@ -107,7 +126,9 @@ function App() {
                 onBack={() => setSelectedDealId(null)}
               />
             )}
-            {activeTab === 'tasks' && <Tasks apiBase={API_BASE} />}
+            {activeTab === 'tasks' && (
+              <Tasks apiBase={API_BASE} onTasksChange={fetchActiveTasksCount} />
+            )}
           </motion.main>
         </div>
       </div>

@@ -57,6 +57,7 @@
 }
 
 .sidebar-icon-button {
+  position: relative;
   min-width: var(--touch-target);
   min-height: var(--touch-target);
   width: 40px;
@@ -69,6 +70,31 @@
   background: rgba(248, 250, 252, 0.9);
   border: 1px solid rgba(229, 231, 235, 0.8);
   transition: all 0.2s;
+}
+
+.sidebar-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  background: #ef4444;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-sizing: border-box;
+}
+
+.sidebar-icon-button.active .sidebar-badge {
+  background: #f87171;
+  border-color: #020617;
 }
 
 .sidebar-icon-button:hover {

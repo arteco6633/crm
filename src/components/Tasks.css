@@ -18,6 +18,9 @@
 }
 
 .filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: var(--radius);
   font-size: 0.875rem;
@@ -37,6 +40,36 @@
   background: var(--accent);
   color: white;
   border-color: var(--accent);
+}
+
+.filter-btn-units {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: nowrap;
+}
+
+.filter-btn-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  flex-shrink: 0;
+}
+
+.filter-btn.active .filter-btn-dot {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.filter-btn-more {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #ef4444;
+  margin-left: 1px;
+}
+
+.filter-btn.active .filter-btn-more {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .tasks-list {

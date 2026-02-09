@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, CheckCircle2, Circle, Clock, AlertCircle, Edit2, Trash2 } from 'lucide-react';
 import './Tasks.css';
 
-export default function Tasks({ apiBase }) {
+export default function Tasks({ apiBase, onTasksChange }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,6 +23,7 @@ export default function Tasks({ apiBase }) {
       console.error('Ошибка загрузки задач:', error);
     } finally {
       setLoading(false);
+      onTasksChange?.();
     }
   };
 
@@ -49,6 +50,8 @@ export default function Tasks({ apiBase }) {
       console.error('Ошибка обновления:', error);
     }
   };
+
+  const activeCount = tasks.filter(t => t.status !== 'completed').length;
 
   const filteredTasks = tasks.filter(task => {
     if (filter === 'all') return true;
@@ -83,6 +86,16 @@ export default function Tasks({ apiBase }) {
           onClick={() => setFilter('pending')}
         >
           Активные
+          {activeCount > 0 && (
+            <span className="filter-btn-units" aria-label={`${activeCount} активных задач`}>
+              {Array.from({ length: Math.min(activeCount, 10) }).map((_, i) => (
+                <span key={i} className="filter-btn-dot" />
+              ))}
+              {activeCount > 10 && (
+                <span className="filter-btn-more">+{activeCount - 10}</span>
+              )}
+            </span>
+          )}
         </button>
         <button
           className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
