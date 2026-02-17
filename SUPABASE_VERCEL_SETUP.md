@@ -30,7 +30,7 @@
    - `deals` (сделки) 
    - `tasks` (задачи)
 
-**Обязательно:** Сразу после создания таблиц выполните в SQL Editor скрипт **`supabase/rls-policies.sql`** из проекта.  
+**Обязательно:** Сразу после создания таблиц выполните в SQL Editor скрипты **`supabase/rls-policies.sql`** и **`supabase/migrations/add_country_to_deals.sql`** (для сегментации сделок по странам).  
 Без этих политик RLS (Row Level Security) приложение через API не увидит данные: будут пустые разделы или 500 на `/api/clients`, `/api/deals`, `/api/tasks`.
 
 ### Шаг 3: Создание Storage Bucket для изображений

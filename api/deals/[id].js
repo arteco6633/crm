@@ -55,7 +55,7 @@ export default async function handler(req, res) {
 
   if (method === 'PUT') {
     try {
-      const { title, client_id, amount, stage, probability, close_date } =
+      const { title, client_id, amount, stage, probability, close_date, country } =
         await getBody(req);
 
       const updateData = {};
@@ -65,6 +65,7 @@ export default async function handler(req, res) {
       if (stage !== undefined) updateData.stage = stage;
       if (probability !== undefined) updateData.probability = probability;
       if (close_date !== undefined) updateData.close_date = close_date;
+      if (country !== undefined) updateData.country = country || null;
 
       const { data, error } = await supabase
         .from('deals')

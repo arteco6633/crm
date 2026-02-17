@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus, User, Mail, Phone, Building, Edit2, Trash2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Plus, User, Mail, Phone, Building, Edit2, Trash2, FileSpreadsheet } from 'lucide-react';
 import './Clients.css';
 
 export default function Clients({ apiBase }) {
@@ -7,6 +7,10 @@ export default function Clients({ apiBase }) {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+  const [createDealsLoading, setCreateDealsLoading] = useState(false);
+  const [createDealsResult, setCreateDealsResult] = useState(null);
 
   useEffect(() => {
     loadClients();
@@ -22,6 +26,55 @@ export default function Clients({ apiBase }) {
       console.error('Ошибка загрузки клиентов:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fileInputRef = useRef(null);
+
+  const handleImportExcel = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    setImportResult(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch(`${apiBase.replace(/\/$/, '')}/import/clients`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Ошибка импорта');
+      }
+      setImportResult(data);
+      loadClients();
+    } catch (error) {
+      setImportResult({ error: error.message });
+    } finally {
+      setImporting(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleCreateDealsFromClients = async () => {
+    setCreateDealsLoading(true);
+    setCreateDealsResult(null);
+    try {
+      const res = await fetch(`${apiBase.replace(/\/$/, '')}/import/create-deals-from-clients`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country: 'Россия' }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || data.hint || 'Ошибка');
+      }
+      setCreateDealsResult(data);
+    } catch (error) {
+      setCreateDealsResult({ error: error.message });
+    } finally {
+      setCreateDealsLoading(false);
     }
   };
 
@@ -43,11 +96,68 @@ export default function Clients({ apiBase }) {
     <div className="clients-page">
       <div className="page-header">
         <h2>Клиенты</h2>
-        <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
-          <Plus size={18} />
-          Добавить клиента
-        </button>
+        <div className="page-header-actions">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleImportExcel}
+            style={{ display: 'none' }}
+          />
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+          >
+            <FileSpreadsheet size={18} />
+            {importing ? 'Загрузка...' : 'Загрузить Excel'}
+          </button>
+          {clients.length > 0 && (
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={handleCreateDealsFromClients}
+              disabled={createDealsLoading}
+            >
+              {createDealsLoading ? 'Создаю...' : 'Создать сделки для клиентов без сделок'}
+            </button>
+          )}
+          <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
+            <Plus size={18} />
+            Добавить клиента
+          </button>
+        </div>
       </div>
+
+      {importResult && (
+        <div className={`import-result ${importResult.error ? 'import-result--error' : 'import-result--ok'}`}>
+          {importResult.error ? (
+            importResult.error
+          ) : (
+            <>
+              Импортировано клиентов: <strong>{importResult.importedClients ?? importResult.imported}</strong>
+              {importResult.importedDeals != null && (
+                <>, сделок: <strong>{importResult.importedDeals}</strong></>
+              )}
+              {importResult.total > (importResult.importedClients ?? importResult.imported) && ` из ${importResult.total}`}
+            </>
+          )}
+        </div>
+      )}
+
+      {createDealsResult && (
+        <div className={`import-result ${createDealsResult.error ? 'import-result--error' : 'import-result--ok'}`}>
+          {createDealsResult.error ? (
+            createDealsResult.error
+          ) : (
+            <>
+              Создано сделок: <strong>{createDealsResult.created}</strong>
+              {createDealsResult.message && ` (${createDealsResult.message})`}
+            </>
+          )}
+        </div>
+      )}
 
       {clients.length === 0 ? (
         <div className="empty-state">

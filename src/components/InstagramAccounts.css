@@ -1,0 +1,171 @@
+.instagram-page {
+  width: 100%;
+  padding: 1.25rem 2rem 1.75rem;
+  background: var(--bg-primary);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  min-height: calc(100vh - 3rem);
+}
+
+.instagram-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.instagram-page .page-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.instagram-page .page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.instagram-page .import-result {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.instagram-page .import-result--ok {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--text-primary);
+}
+
+.instagram-page .import-result--error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.instagram-page .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.instagram-page .empty-state svg {
+  color: var(--text-tertiary);
+  margin-bottom: 1rem;
+}
+
+.instagram-page .empty-state h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.instagram-page .empty-state p {
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+  max-width: 400px;
+}
+
+.instagram-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.instagram-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.instagram-table th {
+  text-align: left;
+  padding: 0.875rem 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+}
+
+.instagram-table th:last-child {
+  width: 48px;
+  text-align: center;
+}
+
+.instagram-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.instagram-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.instagram-table tbody tr:hover {
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.ig-username {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.ig-username:hover {
+  text-decoration: underline;
+}
+
+.ig-full-name {
+  color: var(--text-secondary);
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-icon-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.btn-icon-danger:hover {
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 768px) {
+  .instagram-page {
+    padding: 1rem;
+  }
+
+  .instagram-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .instagram-table th:nth-child(2),
+  .instagram-table td:nth-child(2) {
+    max-width: 120px;
+  }
+}

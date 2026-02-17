@@ -23,9 +23,10 @@ export default async function handler(req, res) {
   const { method } = req;
 
   if (method === 'GET') {
-    // список сделок
+    // список сделок (?country=Россия)
     try {
-      const { data, error } = await supabase
+      const country = req.query?.country;
+      let query = supabase
         .from('deals')
         .select(
           `
@@ -41,6 +42,12 @@ export default async function handler(req, res) {
         )
         .order('created_at', { ascending: false });
 
+      if (country && typeof country === 'string') {
+        query = query.eq('country', country.trim());
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
       res.status(200).json(data || []);
     } catch (error) {
@@ -53,7 +60,7 @@ export default async function handler(req, res) {
   if (method === 'POST') {
     // создать сделку
     try {
-      const { title, client_id, amount, stage, probability, close_date } =
+      const { title, client_id, amount, stage, probability, close_date, country } =
         await getBody(req);
 
       const { data, error } = await supabase
@@ -66,6 +73,7 @@ export default async function handler(req, res) {
             stage: stage || 'new',
             probability: probability || 0,
             close_date: close_date || null,
+            country: country || null,
           },
         ])
         .select()

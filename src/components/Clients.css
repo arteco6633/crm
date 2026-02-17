@@ -69,6 +69,20 @@
   gap: 0.4rem;
 }
 
+.clients-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.clients-page .page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .clients-page .page-header h2 {
   display: inline-flex;
   align-items: center;
@@ -190,6 +204,23 @@
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
   color: var(--text-primary);
+}
+
+.import-result {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.import-result--ok {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.import-result--error {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .empty-state p {

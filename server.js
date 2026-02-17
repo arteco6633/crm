@@ -5,6 +5,8 @@ import { clientsRouter } from './routes/clients.js';
 import { dealsRouter } from './routes/deals.js';
 import { tasksRouter } from './routes/tasks.js';
 import { uploadRouter } from './routes/upload.js';
+import { importRouter } from './routes/import.js';
+import { instagramRouter } from './routes/instagram.js';
 
 dotenv.config();
 
@@ -20,6 +22,8 @@ app.use('/api/clients', clientsRouter);
 app.use('/api/deals', dealsRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/import', importRouter);
+app.use('/api/instagram', instagramRouter);
 
 // Проверка здоровья API
 app.get('/api/health', (req, res) => {

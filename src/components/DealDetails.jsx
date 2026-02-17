@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, User, Phone, FileText, Calendar, Plus, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, User, Phone, FileText, Calendar, Plus, CheckCircle2, Globe, Instagram, ExternalLink } from 'lucide-react';
 import './DealDetails.css';
 
 export default function DealDetails({ apiBase, dealId, onBack }) {
@@ -13,7 +13,10 @@ export default function DealDetails({ apiBase, dealId, onBack }) {
     amount: '',
     probability: '',
     close_date: '',
+    country: '',
+    instagram_account_id: '',
   });
+  const [instagramAccounts, setInstagramAccounts] = useState([]);
   const [taskForm, setTaskForm] = useState({
     title: '',
     description: '',
@@ -45,21 +48,26 @@ export default function DealDetails({ apiBase, dealId, onBack }) {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [dealRes, tasksRes] = await Promise.all([
+      const [dealRes, tasksRes, igRes] = await Promise.all([
         fetch(`${apiBase}/deals/${dealId}`),
         fetch(`${apiBase}/tasks`),
+        fetch(`${apiBase}/instagram`),
       ]);
 
       const dealData = await dealRes.json();
       const tasksData = await tasksRes.json();
+      const igData = await igRes.json();
 
       setDeal(dealData || null);
+      setInstagramAccounts(Array.isArray(igData) ? igData : []);
       if (dealData) {
         setInfoForm({
           title: dealData.title || '',
           amount: dealData.amount != null ? String(dealData.amount) : '',
           probability: dealData.probability || '',
           close_date: dealData.close_date || '',
+          country: dealData.country || '',
+          instagram_account_id: dealData.instagram_account_id || '',
         });
       }
       if (dealData?.clients) {
@@ -99,6 +107,8 @@ export default function DealDetails({ apiBase, dealId, onBack }) {
           amount: infoForm.amount ? Number(String(infoForm.amount).replace(/[^\d]/g, '')) : 0,
           probability: infoForm.probability ? Number(infoForm.probability) : 0,
           close_date: infoForm.close_date || null,
+          country: infoForm.country || null,
+          instagram_account_id: infoForm.instagram_account_id || null,
         }),
       });
       const data = await res.json();
@@ -338,6 +348,61 @@ export default function DealDetails({ apiBase, dealId, onBack }) {
                 placeholder="0"
                 onChange={(e) => setInfoForm({ ...infoForm, probability: e.target.value })}
               />
+            </div>
+
+            <div className="deal-field">
+              <span className="label">Instagram</span>
+              <select
+                className="value-input"
+                value={infoForm.instagram_account_id}
+                onChange={(e) => setInfoForm({ ...infoForm, instagram_account_id: e.target.value })}
+              >
+                <option value="">Не привязан</option>
+                {instagramAccounts.map(ig => (
+                  <option key={ig.id} value={ig.id}>@{ig.username} {ig.full_name ? `— ${ig.full_name}` : ''}</option>
+                ))}
+              </select>
+            </div>
+
+            {deal?.instagram_accounts && (
+              <div className="deal-instagram-block">
+                <h4><Instagram size={16} /> Instagram аккаунт</h4>
+                <div className="deal-instagram-row">
+                  <span className="label">Username:</span>
+                  <a href={deal.instagram_accounts.user_link || `https://instagram.com/${deal.instagram_accounts.username}`} target="_blank" rel="noopener noreferrer">
+                    @{deal.instagram_accounts.username}
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+                {deal.instagram_accounts.full_name && (
+                  <div className="deal-instagram-row">
+                    <span className="label">Имя:</span>
+                    <span>{deal.instagram_accounts.full_name}</span>
+                  </div>
+                )}
+                <div className="deal-instagram-row">
+                  <span className="label">Приватный:</span>
+                  <span>{deal.instagram_accounts.is_private ? 'Да' : 'Нет'}</span>
+                </div>
+                <div className="deal-instagram-row">
+                  <span className="label">Верифицирован:</span>
+                  <span>{deal.instagram_accounts.is_verified ? 'Да' : 'Нет'}</span>
+                </div>
+              </div>
+            )}
+
+            <div className="deal-field">
+              <span className="label">Страна</span>
+              <select
+                className="value-input"
+                value={infoForm.country}
+                onChange={(e) => setInfoForm({ ...infoForm, country: e.target.value })}
+              >
+                <option value="">Не указана</option>
+                {['Россия', 'Казахстан', 'Беларусь', 'Узбекистан', 'Украина', 'Армения', 'Грузия', 'Азербайджан', 'Киргизия', 'Таджикистан', 'Туркменистан', 'Другое'].map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
             </div>
 
             <div className="deal-field">

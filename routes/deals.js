@@ -3,10 +3,10 @@ import { supabase } from '../config/supabase.js';
 
 const router = express.Router();
 
-// Получить все сделки
+// Получить все сделки (опционально: ?country=Россия)
 router.get('/', async (req, res) => {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('deals')
       .select(`
         *,
@@ -16,9 +16,24 @@ router.get('/', async (req, res) => {
           email,
           phone,
           company
+        ),
+        instagram_accounts:instagram_account_id (
+          id,
+          username,
+          user_link,
+          full_name,
+          is_private,
+          is_verified
         )
       `)
       .order('created_at', { ascending: false });
+
+    const { country } = req.query;
+    if (country && typeof country === 'string') {
+      query = query.eq('country', country.trim());
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 
@@ -44,6 +59,14 @@ router.get('/:id', async (req, res) => {
           email,
           phone,
           company
+        ),
+        instagram_accounts:instagram_account_id (
+          id,
+          username,
+          user_link,
+          full_name,
+          is_private,
+          is_verified
         )
       `)
       .eq('id', id)
@@ -61,7 +84,7 @@ router.get('/:id', async (req, res) => {
 // Создать новую сделку
 router.post('/', async (req, res) => {
   try {
-    const { title, client_id, amount, stage, probability, close_date /*, image_url*/ } = req.body;
+    const { title, client_id, amount, stage, probability, close_date, country, instagram_account_id } = req.body;
 
     const { data, error } = await supabase
       .from('deals')
@@ -73,7 +96,8 @@ router.post('/', async (req, res) => {
           stage: stage || 'new',
           probability: probability || 0,
           close_date: close_date || null,
-          // image_url: image_url || null, // колонка может отсутствовать — временно не пишем
+          country: country || null,
+          instagram_account_id: instagram_account_id || null,
         },
       ])
       .select()
@@ -92,7 +116,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, client_id, amount, stage, probability, close_date, image_url } = req.body;
+    const { title, client_id, amount, stage, probability, close_date, image_url, country, instagram_account_id } = req.body;
 
     const updateData = {};
     if (title !== undefined) updateData.title = title;
@@ -101,6 +125,8 @@ router.put('/:id', async (req, res) => {
     if (stage !== undefined) updateData.stage = stage;
     if (probability !== undefined) updateData.probability = probability;
     if (close_date !== undefined) updateData.close_date = close_date;
+    if (country !== undefined) updateData.country = country || null;
+    if (instagram_account_id !== undefined) updateData.instagram_account_id = instagram_account_id || null;
     // image_url колонка может отсутствовать, чтобы не падать — обновляем только если она есть в БД
     // if (image_url !== undefined) updateData.image_url = image_url;
 

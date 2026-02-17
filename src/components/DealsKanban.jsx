@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -19,8 +19,24 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Plus, Image as ImageIcon, DollarSign, Calendar, User, Pencil, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Image as ImageIcon, DollarSign, Calendar, User, Pencil, Trash2, GripVertical, Globe, Instagram } from 'lucide-react';
 import './DealsKanban.css';
+
+const COUNTRIES = [
+  '',
+  'Россия',
+  'Казахстан',
+  'Беларусь',
+  'Узбекистан',
+  'Украина',
+  'Армения',
+  'Грузия',
+  'Азербайджан',
+  'Киргизия',
+  'Таджикистан',
+  'Туркменистан',
+  'Другое',
+];
 
 const STAGES = [
   { id: 'new', label: 'Новая', color: '#94a3b8' },
@@ -84,6 +100,20 @@ function DealCard({ deal, onEdit, onDelete, onOpen }) {
             </div>
           )}
         </div>
+        {deal.instagram_accounts && (
+          <div className="deal-card-instagram">
+            <Instagram size={12} />
+            <a href={deal.instagram_accounts.user_link || `https://instagram.com/${deal.instagram_accounts.username}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+              @{deal.instagram_accounts.username}
+            </a>
+          </div>
+        )}
+        {deal.country && (
+          <div className="deal-card-country">
+            <Globe size={12} />
+            <span>{deal.country}</span>
+          </div>
+        )}
         {deal.close_date && (
           <div className="deal-card-date">
             <Calendar size={12} />
@@ -150,6 +180,8 @@ export default function DealsKanban({ apiBase, onOpenDeal }) {
   const [editingDeal, setEditingDeal] = useState(null);
   const [activeId, setActiveId] = useState(null);
   const [clients, setClients] = useState([]);
+  const [instagramAccounts, setInstagramAccounts] = useState([]);
+  const [countryFilter, setCountryFilter] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -163,14 +195,31 @@ export default function DealsKanban({ apiBase, onOpenDeal }) {
   );
 
   useEffect(() => {
-    loadDeals();
     loadClients();
+    loadInstagramAccounts();
   }, []);
+
+  const loadInstagramAccounts = async () => {
+    try {
+      const res = await fetch(`${apiBase}/instagram`);
+      const data = await res.json();
+      setInstagramAccounts(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Ошибка загрузки Instagram:', e);
+    }
+  };
+
+  useEffect(() => {
+    loadDeals();
+  }, [countryFilter]);
 
   const loadDeals = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${apiBase}/deals`);
+      const url = countryFilter
+        ? `${apiBase}/deals?country=${encodeURIComponent(countryFilter)}`
+        : `${apiBase}/deals`;
+      const response = await fetch(url);
       const data = await response.json();
       setDeals(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -263,10 +312,27 @@ export default function DealsKanban({ apiBase, onOpenDeal }) {
     <div className="deals-kanban">
       <div className="page-header">
         <h2>Сделки</h2>
-        <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
-          <Plus size={18} />
-          Добавить сделку
-        </button>
+        <div className="page-header-actions">
+          <div className="deals-country-filter">
+            <Globe size={16} />
+            <select
+              value={countryFilter}
+              onChange={(e) => setCountryFilter(e.target.value)}
+              className="country-filter-select"
+              aria-label="Фильтр по стране"
+            >
+              <option value="">Все страны</option>
+              {COUNTRIES.filter(c => c).map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <InstagramImportButton apiBase={apiBase} onImport={loadInstagramAccounts} />
+          <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
+            <Plus size={18} />
+            Добавить сделку
+          </button>
+        </div>
       </div>
 
       <DndContext
@@ -299,6 +365,7 @@ export default function DealsKanban({ apiBase, onOpenDeal }) {
         <DealModal
           deal={editingDeal}
           clients={clients}
+          instagramAccounts={instagramAccounts}
           onClose={() => {
             setIsModalOpen(false);
             setEditingDeal(null);
@@ -315,7 +382,7 @@ export default function DealsKanban({ apiBase, onOpenDeal }) {
   );
 }
 
-function DealModal({ deal, clients, onClose, onSave, apiBase }) {
+function DealModal({ deal, clients, instagramAccounts = [], onClose, onSave, apiBase }) {
   const [formData, setFormData] = useState({
     title: '',
     client_id: '',
@@ -323,6 +390,8 @@ function DealModal({ deal, clients, onClose, onSave, apiBase }) {
     stage: 'new',
     probability: '',
     close_date: '',
+    country: '',
+    instagram_account_id: '',
     image: null,
   });
   const [uploading, setUploading] = useState(false);
@@ -336,6 +405,8 @@ function DealModal({ deal, clients, onClose, onSave, apiBase }) {
         stage: deal.stage || 'new',
         probability: deal.probability || '',
         close_date: deal.close_date || '',
+        country: deal.country || '',
+        instagram_account_id: deal.instagram_account_id || '',
         image: null,
       });
     }
@@ -386,6 +457,8 @@ function DealModal({ deal, clients, onClose, onSave, apiBase }) {
       stage: formData.stage,
       probability: parseInt(formData.probability) || 0,
       close_date: formData.close_date || null,
+      country: formData.country || null,
+      instagram_account_id: formData.instagram_account_id || null,
       image_url: imageUrl,
     };
 
@@ -458,6 +531,32 @@ function DealModal({ deal, clients, onClose, onSave, apiBase }) {
             </div>
           </div>
 
+          <div className="form-group">
+            <label>Instagram</label>
+            <select
+              value={formData.instagram_account_id}
+              onChange={(e) => setFormData({ ...formData, instagram_account_id: e.target.value })}
+            >
+              <option value="">Не привязан</option>
+              {instagramAccounts.map(ig => (
+                <option key={ig.id} value={ig.id}>@{ig.username} {ig.full_name ? `— ${ig.full_name}` : ''}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Страна</label>
+            <select
+              value={formData.country}
+              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+            >
+              <option value="">Не указана</option>
+              {COUNTRIES.filter(c => c).map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label>Стадия</label>
@@ -513,6 +612,39 @@ function DealModal({ deal, clients, onClose, onSave, apiBase }) {
         </form>
       </div>
     </div>
+  );
+}
+
+function InstagramImportButton({ apiBase, onImport }) {
+  const [importing, setImporting] = useState(false);
+  const fileRef = useRef(null);
+  const handleChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch(`${apiBase.replace(/\/$/, '')}/import/instagram`, { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      onImport?.();
+      alert(`Импортировано: ${data.imported}`);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setImporting(false);
+      e.target.value = '';
+    }
+  };
+  return (
+    <>
+      <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleChange} style={{ display: 'none' }} />
+      <button type="button" className="btn-secondary" onClick={() => fileRef.current?.click()} disabled={importing}>
+        <Instagram size={18} />
+        {importing ? 'Загрузка...' : 'Загрузить Instagram'}
+      </button>
+    </>
   );
 }
 

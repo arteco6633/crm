@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { LayoutDashboard, Users, KanbanSquare, CheckSquare2, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, KanbanSquare, CheckSquare2, Instagram, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
 import Clients from './components/Clients';
 import DealsKanban from './components/DealsKanban';
 import DealDetails from './components/DealDetails';
 import Tasks from './components/Tasks';
+import InstagramAccounts from './components/InstagramAccounts';
 import Dashboard from './components/Dashboard';
 import './App.css';
 
@@ -77,6 +78,16 @@ function App() {
               <KanbanSquare size={20} />
             </button>
             <button
+              className={`sidebar-icon-button ${activeTab === 'instagram' ? 'active' : ''}`}
+              aria-label="Instagram"
+              onClick={() => {
+                setActiveTab('instagram');
+                setSelectedDealId(null);
+              }}
+            >
+              <Instagram size={20} />
+            </button>
+            <button
               className={`sidebar-icon-button ${activeTab === 'tasks' ? 'active' : ''}`}
               aria-label={activeTasksCount > 0 ? `Задачи (${activeTasksCount} активных)` : 'Задачи'}
               onClick={() => {
@@ -125,6 +136,9 @@ function App() {
                 dealId={selectedDealId}
                 onBack={() => setSelectedDealId(null)}
               />
+            )}
+            {activeTab === 'instagram' && (
+              <InstagramAccounts apiBase={API_BASE} />
             )}
             {activeTab === 'tasks' && (
               <Tasks apiBase={API_BASE} onTasksChange={fetchActiveTasksCount} />

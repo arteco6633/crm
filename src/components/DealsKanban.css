@@ -9,6 +9,40 @@
   min-height: calc(100vh - 3rem);
 }
 
+.deals-country-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.deals-country-filter .country-filter-select {
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.deals-country-filter .country-filter-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.deal-card-country {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-top: 0.2rem;
+}
+
+.deal-card-country svg {
+  flex-shrink: 0;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -25,6 +59,13 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-primary);
+}
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .btn-primary {
